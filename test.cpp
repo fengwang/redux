@@ -19,12 +19,19 @@ int main()
     store.subscribe( []( int state ){ std::cout << "Dec: " << std::dec << state << std::endl; } );
     store.subscribe( []( int state ){ std::cout << "Hex: " << std::hex << state << std::endl; } );
 
+    std::cout << "Increase:\n";
     store.dispatch<"increment_action">();
+    std::cout << "Decrease:\n";
     store.dispatch<"decrement_action">();
+    std::cout << "Custom(7):\n";
     store.dispatch<"custom_action">( 7 );
+    std::cout << "Condition(10, 10):\n";
     store.dispatch<"conditional_action">( 10, 10 );
+    std::cout << "Condition(11, 9):\n";
     store.dispatch<"conditional_action">( 11, 9 );
+    std::cout << "Condition(12, 8):\n";
     store.dispatch<"conditional_action">( 12, 8 );
+    std::cout << "Condition(13, 7):\n";
     store.dispatch<"conditional_action">( 13, 7 );
 
     std::cout << "Our store holds a state " << std::dec << store.get_state() << std::endl;
