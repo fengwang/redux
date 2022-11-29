@@ -4,7 +4,9 @@
 This is a C++20 header-only [redux](https://en.wikipedia.org/wiki/Redux_(JavaScript_library)) implementation.
 
 
-### Example usage
+![CI](https://github.com/fengwang/redux/actions/workflows/ci.yml/badge.svg)
+
+### [Example usage](./test.cpp)
 
 **Create a store**
 
