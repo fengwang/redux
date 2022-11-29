@@ -1,2 +1,2 @@
 all: test.cpp
-	g++ -o test test.cpp -std=c++20 -O2 -Wall -Wextra -Ofast
+	g++ -o test test.cpp -std=c++20 -Wall -Wextra -Ofast -flto=auto  -funroll-all-loops -pipe -march=native

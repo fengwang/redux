@@ -1,4 +1,4 @@
-// from https://github.com/fengwang/meta-structure/raw/main/meta_structure.hpp
+// Adapted from https://github.com/fengwang/meta-structure/raw/main/meta_structure.hpp
 #ifndef META_STRUCTURE_HPP_INCLUDED_ASDLJOP4IJALKJASLKJDASFLKSDJSADFKJASDFOKJSDF
 #define META_STRUCTURE_HPP_INCLUDED_ASDLJOP4IJALKJASLKJDASFLKSDJSADFKJASDFOKJSDF
 
@@ -36,7 +36,6 @@ struct overload : Ts...
 }; // struct overload
 
 template<class... Ts> overload(Ts...) -> overload<Ts...>;
-
 
 template< fixed_string tag_, typename T >
 struct member
@@ -447,7 +446,6 @@ constexpr auto upgrade_struct( S const& structure, T const& value ) noexcept
             return concatenate_struct( create_struct( m ), upgrade_struct<tag_>( create_struct( members... ) ) );
     } );
 }
-
 
 }//namespace meta
 

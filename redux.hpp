@@ -20,8 +20,6 @@ namespace redux
     template< typename S, typename State_Type >
     store<meta::structure<S>, State_Type> make_store( meta::structure<S> const& meta_structure, State_Type const& state, std::vector<std::function<void(State_Type)>> const& subscribers=std::vector<std::function<void(State_Type)>>{} ) noexcept;
 
-
-
     template <meta::Structure Reducers, typename State_Type>
     struct store
     {
