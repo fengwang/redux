@@ -8,6 +8,19 @@
 
 namespace redux
 {
+    template< meta::fixed_string tag, typename Action >
+    auto make_reducer( Action const& action ) noexcept;
+
+    template<meta::Member ... Reducers>
+    auto make_reducers( Reducers const& ... reducers ) noexcept;
+
+    template <meta::Structure Reducers, typename State_Type>
+    struct store;
+
+    template< typename S, typename State_Type >
+    store<meta::structure<S>, State_Type> make_store( meta::structure<S> const& meta_structure, State_Type const& state, std::vector<std::function<void(State_Type)>> const& subscribers=std::vector<std::function<void(State_Type)>>{} ) noexcept;
+
+
 
     template <meta::Structure Reducers, typename State_Type>
     struct store
@@ -16,12 +29,14 @@ namespace redux
         State_Type state_;
         std::vector<std::function<void(State_Type)>> subscribers_;
 
-        store( Reducers const& reducers, State_Type const& state ) noexcept : reducers_{ reducers }, state_{ state } { }
+        constexpr store( Reducers const& reducers, State_Type const& state,
+                         std::vector<std::function<void(State_Type)>> const& subscribers=std::vector<std::function<void(State_Type)>>{}  ) noexcept :
+                         reducers_{ reducers }, state_{ state }, subscribers_{subscribers} { }
 
         template< typename Subscriber >
-        void subscribe( Subscriber const& subscriber )
+        void subscribe( Subscriber const& subscriber ) noexcept
         {
-            subscribers_.push_back( std::function<void(State_Type)>{subscriber} );
+            subscribers_.emplace_back( std::function<void(State_Type)>{subscriber} );
         }
 
         template< meta::fixed_string tag, typename ... Args >
@@ -32,14 +47,27 @@ namespace redux
                 subscriber( state_ );
         }
 
-        State_Type const state() const noexcept
+        State_Type const get_state() const noexcept
         {
             return state_;
         }
 
-        State_Type& state() noexcept
+        template<meta::fixed_string tag, typename New_Action >
+        auto append_reducer( New_Action const& new_action ) const noexcept
         {
-            return state_;
+            return make_store( reducers_.template update<tag>(new_action),  state_, subscribers_ );
+        }
+
+        template<meta::fixed_string tag, typename New_Action >
+        auto replace_reducer( New_Action const& new_action ) const noexcept
+        {
+            return make_store( reducers_.template update<tag>(new_action),  state_, subscribers_ );
+        }
+
+        template<meta::fixed_string tag>
+        auto remove_reducer() const noexcept
+        {
+            return make_store( reducers_.template remove<tag>(),  state_, subscribers_ );
         }
 
     }; // struct store
@@ -57,43 +85,12 @@ namespace redux
     }
 
     template< typename S, typename State_Type >
-    store<meta::structure<S>, State_Type> make_store( meta::structure<S> const& meta_structure, State_Type const& state ) noexcept
+    store<meta::structure<S>, State_Type> make_store( meta::structure<S> const& meta_structure, State_Type const& state, std::vector<std::function<void(State_Type)>> const& subscribers ) noexcept
     {
-        return store{ meta_structure, state };
+        return store{ meta_structure, state, subscribers };
     }
 
 } // namespace redux
 
 #endif//REDUX_H_INCLUDED_DOFSPIASDLFKJASDDFLKJASDDFOIUJ4RLKJAFSDLKJSAFDKLJSADFJ
-
-#if 0
-
-struct increment_action{};
-struct decrement_action{};
-
-struct reducer
-{
-    template< typename T >
-    T operator()( T state, increment_action ) const noexcept
-    {
-        return state + 1;
-    }
-
-    template< typename T >
-    T operator()( T state, decrement_action ) const noexcept
-    {
-        return state - 1;
-    }
-
-};
-
-redux::store{ reducer{}, 0 }; // create a reducer with initial parameter 0
-auto const& loger = []( int state ){ std::cout << state << std::endl; };
-store.subscribe( loger );
-store.dispatch( increment_action{} );
-store.dispatch( increment_action{} );
-store.dispatch( decrement_action{} );
-
-#endif
-
 
