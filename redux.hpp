@@ -4,17 +4,19 @@
 #include <functional>
 #include <vector>
 
+#include "./meta_structure.hpp"
+
 namespace redux
 {
 
-    template <typename Reducer, typename State_Type>
+    template <meta::Structure Reducers, typename State_Type>
     struct store
     {
-        Reducer reducer_;
+        Reducers reducers_;
         State_Type state_;
         std::vector<std::function<void(State_Type)>> subscribers_;
 
-        store( Reducer const& reducer, State_Type const& state ) noexcept : reducer_{ reducer }, state_{ state } { }
+        store( Reducers const& reducers, State_Type const& state ) noexcept : reducers_{ reducers }, state_{ state } { }
 
         template< typename Subscriber >
         void subscribe( Subscriber const& subscriber )
@@ -22,10 +24,10 @@ namespace redux
             subscribers_.push_back( std::function<void(State_Type)>{subscriber} );
         }
 
-        template< typename Action_Type >
-        void dispatch( Action_Type const& action ) noexcept
+        template< meta::fixed_string tag, typename ... Args >
+        void dispatch( Args const& ... args ) noexcept
         {
-            state_ = reducer_( state_, action );
+            state_ = reducers_.template read<tag>()( state_, args... );
             for ( auto const& subscriber : subscribers_ )
                 subscriber( state_ );
         }
@@ -41,6 +43,24 @@ namespace redux
         }
 
     }; // struct store
+
+    template< meta::fixed_string tag, typename Action >
+    auto make_reducer( Action const& action ) noexcept
+    {
+        return meta::make_member<tag>( action );
+    }
+
+    template<meta::Member ... Reducers>
+    auto make_reducers( Reducers const& ... reducers ) noexcept
+    {
+        return meta::make_struct( reducers... );
+    }
+
+    template< typename S, typename State_Type >
+    store<meta::structure<S>, State_Type> make_store( meta::structure<S> const& meta_structure, State_Type const& state ) noexcept
+    {
+        return store{ meta_structure, state };
+    }
 
 } // namespace redux
 
