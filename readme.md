@@ -1,7 +1,7 @@
 # This is a predicable state manager for C++ applications.
 ----
 
-Example usage:
+### Example usage
 
 **Create a store**
 
@@ -127,6 +127,53 @@ Oct: 21
 Dec: 17
 Hex: 11
 ```
+
+### Bonus
+
+
+#### Remove a reducer from a store
+
+Just call `store.remove_reducer<"ACTION_NAME">()` to create a new store without the specified `ACTION_NAME` reducer. For example:
+
+```cpp
+auto&& new_store = store.remove_reducer<"custom_action">();
+new_store.dispatch<"increment_action">();
+new_store.dispatch<"decrement_action">();
+//new_store.dispatch<"custom_action">( 7 ); // <-- will triger compile time error
+new_store.dispatch<"conditional_action">( 12, 8 );
+```
+
+### Append a new reducer to a store
+
+Just call `store.append_reducer<"ACTION_NAME">( ACTION_DETAILS )` to create a new store with an additional reducer. For example:
+
+```cpp
+auto&& new_store = store.append_reducer<"custom_action_2">( [](int current_state, int new_custom_step){ return current_state + new_custom_step*7; } );
+new_store.dispatch<"custom_action_2">( 7 ); // now possible
+```
+
+
+### Replace a reducer with new actions
+
+
+Just call `store.replace_reducer<"ACTION_NAME">( NEW_ACTION_DETAILS )` to create a new store with an updated reducer. For example:
+
+```cpp
+auto&& new_store = store.replace_reducer<"increment_action">( [](int current_state, int new_custom_step){ return current_state + new_custom_step*7; } );
+new_store.dispatch<"increment_action">( 7 );
+```
+
+With this new store, invoking increment_action will increase the current state by 7 instead of 1.
+
+
+
+## License
+
+AGPL-v3
+
+
+
+
 
 
 
