@@ -1,5 +1,8 @@
-# This is a predicable state manager for C++ applications.
+# This is a predicable state container for C++ applications.
 ----
+
+This is a C++20 header-only [redux](https://en.wikipedia.org/wiki/Redux_(JavaScript_library)) implementation.
+
 
 ### Example usage
 
@@ -166,6 +169,10 @@ new_store.dispatch<"increment_action">( 7 );
 With this new store, invoking increment_action will increase the current state by 7 instead of 1.
 
 
+## Test environment
+
++ gcc-12.2.0
++ Arch Linux 5.15.79-1-lts
 
 ## License
 
